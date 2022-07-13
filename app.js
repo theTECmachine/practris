@@ -1,4 +1,4 @@
-let das
+  let das
 //defining scale of grid tiles 
 let scaleX
 let scaleY
@@ -155,6 +155,21 @@ function controlAni(piece, controls, handling){// moving da pieces
       piece.move(-piece.x, 0)
     }
   }
+}else if (controls.side == 'd'){
+  if(piece.x > 0 && dasTimer == false){
+    piece.move(1, 0)
+    dasTimer = true //only run this code once
+    console.log('hello!')
+    setTimeout(function(){das = true; console.log('das is on')}, handling['DAS'])
+  }else if (piece.x > 0 && das == true){
+    if(handling['ARR'] != 0){
+    let activeARR = setInterval(function(){piece.move(0, 1)}, handling['ARR'])
+    console.log('arr is not 0')
+    }else{
+      console.log('arr is 0')
+      piece.move(10-piece.x, 0)
+    }
+  } 
 }else{
   dasTimer = false
   das = false
