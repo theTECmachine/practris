@@ -1,0 +1,22 @@
+body {
+  background: #979797;
+  color: #f8f8f8;
+}
+canvas {
+  padding: 0;
+  margin: 0 auto;
+  margin-bottom: 1rem;
+  display: block;
+
+}
+#stage {
+  width: 400px;
+  height: 800px;
+  position: relative;
+  border: 2px solid black;
+}
+
+canvas { position: absolute; }
+/* #ui-layer { z-index: 3; } */
+#game-layer { z-index: 2; }
+#grid { z-index: 1; }
