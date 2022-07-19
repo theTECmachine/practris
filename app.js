@@ -1,3 +1,4 @@
+
   let das
 //defining scale of grid tiles 
 let scaleX
@@ -21,27 +22,30 @@ let controls = {
 }
   document.addEventListener('keydown',move);
 	function move(e) {
+
 		//code that registers if you let go of a key, needed for multi-key inputs
 		//code that registers if a key is down
-		 if(e.key == 's'){
+
+    let keyPressed = e.key.toLowerCase()
+		 if(keyPressed == 's'){
 			  controls.s = true;
-		} else if(e.key == 'a'){
+		} else if(keyPressed == 'a'){
         controls.a = true;
 		} 
-    controls.side = e.key
+    controls.side = keyPressed
 		
 
-			console.log(controls.side);
       document.addEventListener('keyup', function(e){
         
-        if(e.key == 's'){
+        // console.log(controls)
+        if(keyPressed == 's'){
            controls.s = false;
-       } else if(e.key == 'a'){
+       } else if(keyPressed == 'a'){
            controls.a = false;
        }
-        if(e.key == controls.side){
+        if(keyPressed == controls.side){
          controls.side = ''
-         console.log(controls)
+         
        }
  
      })
@@ -68,38 +72,76 @@ function init () {
       this.y = 0
       this.center = new Tile(this.x, this.y)
       
+
+      //defining the other 3 blocks
       //defining block 1, not center
       this.x1 = x1 + this.x
       this.y1 = y1 + this.y
       this.block1 = new Tile(this.x1, this.y1)
-
       //doing the same again for block 2
       this.x2 = x2 + this.x
       this.y2 = y2 + this.y
       this.block2 = new Tile(this.x2, this.y2)
-
       //final one
       this.x3 = x3 + this.x
       this.y3 = y3 + this.y
       this.block3 = new Tile(this.x3, this.y3)
+      //put all blocks in an array for the change method
+      this.blocks = [this.center, this.block1, this.block2, this.block3]
+      this.blocksPosX = [this.x, this.x1, this.x2, this.x3]
+      this.blocksPosY = [this.y, this.y1, this.y2, this.y3]
       
     }
+   
     move(changeX, changeY){
-      clearTile(this.center, ctx)
-      clearTile(this.block1, ctx)
-      clearTile(this.block2, ctx)
-      clearTile(this.block3, ctx)
-      this.x += changeX 
-      this.y += changeY 
-      // console.log(this.x, this.y)
-      this.center = new Tile(this.x, this.y)
-      this.block1 = new Tile(this.x1 += changeX, this.y1 += changeY)
-      this.block2 = new Tile(this.x2 += changeX, this.y2 += changeY)
-      this.block3 = new Tile(this.x3 += changeX, this.y3 += changeY)
-      fillTile(this.center, ctx)
-      fillTile(this.block1, ctx)
-      fillTile(this.block2, ctx)
-      fillTile(this.block3, ctx)
+      this.x += changeX
+      this.y += changeY
+      let touchingEdge
+      // erase prev blocks 
+      //for statements must be separated, to erase, draw, and check if any blocks are already on the edge separately
+      for(let i = 0; i < this.blocks.length; i++){
+      if(this.blocksPosX[i] + changeX < 0 || this.blocksPosX[i] + changeX > 9){
+        console.log(this.blocksPosX[i] + changeX)
+        console.log('touchingEdge')
+        touchingEdge = true
+        return 
+      
+      }
+    }
+      for(let i = 0; i < this.blocks.length; i++){
+        
+        
+      
+        if(touchingEdge != true){
+        clearTile(this.blocks[i], ctx)
+        
+        }
+      }
+  
+        for(let i = 0; i < this.blocks.length; i++){// erase prev blocks
+        
+          this.blocks[i] = new Tile(this.blocksPosX[i] += changeX, this.blocksPosY[i] += changeY)
+        
+    
+        // drawing new ones
+          fillTile(this.blocks[i], ctx)
+          // console.log(this.blocks[i])
+        
+      }
+ 
+      
+
+    
+
+    }
+    rotate(direction){
+      if(direction == 'right'){
+        for(let i = 0; i < this.blocks.length; i++){// erase prev blocks
+          let diffX = this.blocks[0]
+        }
+      }else if(direction == 'left'){
+
+      }
     }
 
 
@@ -109,11 +151,9 @@ function init () {
 
   //customizable DAS and ARR
   let handling = {
-    'wait' : 1,
     'DAS' : 115,
     'ARR' : 0,
   }
-  handling.current = handling.wait
   //this runs the game
   drawGrid()
   piece.move(0,0)
@@ -125,7 +165,10 @@ function init () {
 
 }
 
-
+//_______________________________________________________________________________________________________
+//_______________________________________________________________________________________________________
+//_______________________________________________________________________________________________________
+//_______________________________________________________________________________________________________
 
 function gravityAni(piece){//where the dropping animation happens
   if(piece.center.row < 19 * scaleY){
@@ -137,46 +180,61 @@ function gravityAni(piece){//where the dropping animation happens
 
 
 let dasTimer = false
-  
+let arr = false 
 function controlAni(piece, controls, handling){// moving da pieces
  
+  // this huge chunk controls side movement
   if(controls.side == 'a'){
-  if(piece.x > 0 && dasTimer == false){
+  if(dasTimer == false){
     piece.move(-1, 0)
     dasTimer = true //only run this code once
-    console.log('hello!')
     setTimeout(function(){das = true; console.log('das is on')}, handling['DAS'])
-  }else if (piece.x > 0 && das == true){
-    if(handling['ARR'] != 0){
-    let activeARR = setInterval(function(){piece.move(0, -1)}, handling['ARR'])
-    console.log('arr is not 0')
-    }else{
-      console.log('arr is 0')
-      piece.move(-piece.x, 0)
+  }else if (das == true && arr == false){
+    if(handling['ARR'] != 0 ){
+      function arrMove(){
+        if (das == true){
+          arr = true
+          piece.move(-1, 0)
+          setTimeout(arrMove, handling['ARR'])
+        }
+      }
+      arrMove()
+    
+    }else if (arr == false){
+      // this shit hard coded - it will not work for diff pieces, need to
+      piece.move(1 -piece.x, 0)
+      console.log(piece.x)
     }
   }
 }else if (controls.side == 'd'){
-  if(piece.x > 0 && dasTimer == false){
+  if(piece.x < 10  && dasTimer == false){
     piece.move(1, 0)
     dasTimer = true //only run this code once
-    console.log('hello!')
     setTimeout(function(){das = true; console.log('das is on')}, handling['DAS'])
-  }else if (piece.x > 0 && das == true){
+  }else if (piece.x > 0 && das == true && arr == false){
     if(handling['ARR'] != 0){
-    let activeARR = setInterval(function(){piece.move(0, 1)}, handling['ARR'])
-    console.log('arr is not 0')
-    }else{
-      console.log('arr is 0')
+      function arrMove(){
+        if(piece.x < 9 && das == true){
+          arr = true
+          piece.move(1, 0)
+          setTimeout(arrMove, handling['ARR'])
+        }
+        
+      }
+      arrMove()
+
+    }else if(arr == false){
       piece.move(10-piece.x, 0)
     }
   } 
 }else{
   dasTimer = false
   das = false
+  
   // console.log('key not pressed')
 }
   
-  setTimeout(function(){controlAni(piece, controls, handling)}, handling.current)
+  setTimeout(function(){controlAni(piece, controls, handling)}, 1)
   
 }
 
